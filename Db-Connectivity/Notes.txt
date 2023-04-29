@@ -1,0 +1,26 @@
+1. Command to Connect to MYSQL instance
+
+kubectl run mysql-client --image=mysql:5.7 -it --rm --restart=Never -- mysql -h masterdatabase.cv8vyj7ah4af.us-east-1.rds.amazonaws.com -u dbadmin -panima123
+
+then run this command
+
+mysql -h database-1.cv8vyj7ah4af.us-east-1.rds.amazonaws.com -u dbadmin -predhat123
+
+#notes
+
+If you want to connect any pod make sure that that workernodes security group is added to RDS Security group as inbound.
+
+always make sure rds is created as private
+
+
+#db commands
+create database usermgmt;
+show <database name>;
+USE mystudentdb;
+SHOW TABLES;
+
+
+https://www.javatpoint.com/mysql-show-list-tables
+
+
+http://54.152.79.3:30492/usermgmt/health-status

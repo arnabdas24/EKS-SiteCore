@@ -1,7 +1,7 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: basic-cluster
+  name: kubemaster
   region: us-east-1
   version: "1.25"
 iam:
@@ -14,24 +14,3 @@ vpc:
           id: "subnet-05cd1f135db8cdfa1"
       us-west-1b:
           id: "subnet-0e941cafe46d2ee0a"
-managedNodeGroups:
-- amiFamily: AmazonLinux2
-  name: linuxworker
-  desiredCapacity: 1
-  instanceType: t3.small
-  volumeType: gp2
-  volumeSize: 20
-  labels: { role: workers }
-  iam:
-    withAddonPolicies:
-      albIngress: true
-      appMesh: true
-      autoScaler: true
-      awsLoadBalancerController: true
-      certManager: false
-      cloudWatch: true
-      ebs: true
-      externalDNS: true
-      imageBuilder: true
-  ssh:
-    enableSsm: true

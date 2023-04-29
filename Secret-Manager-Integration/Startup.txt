@@ -1,0 +1,42 @@
+helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+helm install -n kube-system csi-secrets-store \
+  --set syncSecret.enabled=true \
+  --set enableSecretRotation=true \
+  secrets-store-csi-driver/secrets-store-csi-driver
+kubectl apply -f https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml
+
+aws --region us-east-1 secretsmanager \
+  create-secret --name DBSecret_eksworkshop \
+  --secret-string '{"username":"foo", "password":"super-sekret"}'
+
+# {
+#     "ARN": "arn:aws:secretsmanager:us-east-1:981601184800:secret:DBSecret_eksworkshop-qfOLRY",
+#     "Name": "DBSecret_eksworkshop",
+#     "VersionId": "30af873e-26d3-415a-b7a3-75144c48ce0e"
+# }
+
+SECRET_ARN=$(aws --region "$AWS_REGION" secretsmanager describe-secret --secret-id  DBSecret_eksworkshop --query 'ARN' | sed -e 's/"//g' )
+
+IAM_POLICY_ARN_SECRET=$(aws --region "$AWS_REGION" iam create-policy --query Policy.Arn --output text --policy-name "mysqlsecretwordpress" \
+    --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [ {
+        "Effect": "Allow",
+        "Action": ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        "Resource": ["'"$SECRET_ARN"'" ]
+    } ]
+}')
+
+
+eksctl utils associate-iam-oidc-provider \
+    --region=us-east-1 --cluster=kubemaster \
+    --approve
+
+eksctl create iamserviceaccount \
+    --region=us-east-1 --name "wordpressmysql"  \
+    --cluster kubemaster \
+    --attach-policy-arn "$IAM_POLICY_ARN_SECRET" --approve \
+    --override-existing-serviceaccounts
+
+
+kubectl logs -l app=csi-secrets-store-provider-aws -n kube-system

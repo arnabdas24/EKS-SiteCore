@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      serviceAccountName: wordpressmysql
+      containers:
+      - image: wordpress:4.8-apache
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: secrets-store-inline
+            mountPath: "/mnt/secrets"
+            readOnly: true
+        name: wordpress
+        resources:
+           limits:
+            memory: 500Mi
+            cpu: 500m
+           requests:
+            memory: 300Mi
+            cpu: 200m
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: mysql
+        - name: WORDPRESS_DB_USER
+          value: dbadmin
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysqlwordpress
+              key: mysqlsecret
+        ports:
+        - containerPort: 80
+          name: wordpress
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: mysqlwordpressdeploy
