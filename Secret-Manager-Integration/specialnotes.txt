@@ -1,0 +1,17 @@
+from management console you can restrict the resources section of eks cluster
+by writing this policy
+
+where you have to explicitly deny the accesstokubernetes api section
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "eks:AccessKubernetesApi"
+            ],
+            "Effect": "Deny",
+            "Resource": "arn:aws:eks:us-east-1:981601184800:cluster/kubemaster"
+        }
+    ]
+}

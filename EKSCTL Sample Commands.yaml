@@ -5,3 +5,5 @@ https://eksctl.io/usage/schema/
 EKSCTL Website
 
 https://eksctl.io/usage/dry-run/
+
+aws eks --region us-east-1 update-kubeconfig --name kubemaster

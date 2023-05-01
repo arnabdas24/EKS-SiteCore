@@ -1,0 +1,36 @@
+please note you cannot redirect traffic in NLB since it doesnt work on L7 , it cannot open packets and read from it
+so if you want to use redirect then you must use an ALB
+
+https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/
+
+AWS load Balancer Controller
+
+ALB supports two modes Instance and IP
+
+Instance Mode:-
+
+Registers nodes/instances/worker nodes within your cluster as targets for ALB
+Traffic reaching is routed to nodeport for your service and then proxied to your port
+This is the default traffic mode
+You can explicitly specify with alb.ingress.kubernetes.io/target-type:instance
+
+IP Mode:-
+
+Registers pods as your targets for the ALB
+Traffic can reach directly to your pod for your service , reducing the latency
+alb.ingress.kubernetes.io/target-type:ip annotation should be used
+
+when you are using fargate profiles , you must use ip mode incase of application Loadbalancer
+
+about aws-lb controller:-
+
+#to list the aws-load-balancer-controllers deployments 
+kubectl get pods -n kube-system -l app.kubernetes.io/instance=aws-load-balancer-controller
+
+# find the tls.crt file 
+kubectl get secrets -n kube-system aws-load-balancer-tls -o yaml
+
+go to base64 decode to decode it
+
+https://www.base64decode.org/
+
