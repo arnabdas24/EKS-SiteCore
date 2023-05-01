@@ -22,15 +22,7 @@ alb.ingress.kubernetes.io/target-type:ip annotation should be used
 
 when you are using fargate profiles , you must use ip mode incase of application Loadbalancer
 
-about aws-lb controller:-
 
-#to list the aws-load-balancer-controllers deployments 
-kubectl get pods -n kube-system -l app.kubernetes.io/instance=aws-load-balancer-controller
+while defining the ingress resource , we can do it via the default backend option or via ingress class resource.
 
-# find the tls.crt file 
-kubectl get secrets -n kube-system aws-load-balancer-tls -o yaml
-
-go to base64 decode to decode it
-
-https://www.base64decode.org/
-
+kubectl patch ingress ingress-nginxapp1  -p '{"metadata":{"finalizers":[]}}' --type=merge
